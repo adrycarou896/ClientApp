@@ -15,13 +15,14 @@ public class Cliente {
 	
 	public static void main(String[] args) {
 		
-		String cometdURL = "http://localhost:8080/cometd/cometd";
+		//String cometdURL = "http://localhost:8080/cometd/cometd";
+		String cometdURL = "http://localhost:8080/bayeux";
 		
-		 HttpClient httpClient = new HttpClient();
+		HttpClient httpClient = new HttpClient();
 		 
-		 Map<String, Object> options = new HashMap<>();
+		Map<String, Object> options = new HashMap<>();
 
-		  LongPollingTransport transport = new LongPollingTransport(options, httpClient) {
+		LongPollingTransport transport = new LongPollingTransport(options, httpClient) {
 
 		    @Override
 		    protected void customize(Request request) {
@@ -36,7 +37,7 @@ public class Cliente {
 		 client.waitFor(1000, BayeuxClient.State.CONNECTED);
 
 		 // Subscription to channels
-		 ClientSessionChannel channel = client.getChannel("/hello");
+		 ClientSessionChannel channel = client.getChannel("/data");
 		 channel.subscribe(new MessageListener() {
 			
 			@Override

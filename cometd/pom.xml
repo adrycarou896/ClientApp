@@ -3,12 +3,22 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+ <servlet>
+        <servlet-class>org.cometd.java.annotation.AnnotationCometDServlet</servlet-class>
+    </servlet>
+    
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.prueba</groupId>
   <artifactId>cometd</artifactId>
   <packaging>war</packaging>
   <version>0.0.1-SNAPSHOT</version>
 
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.1.4.RELEASE</version>
+	</parent>
+	
   <properties>
     <cometd-version>4.0.4</cometd-version>
     <jetty-version>9.4.18.v20190429</jetty-version>
@@ -54,6 +64,17 @@
   </build>
 
   <dependencies>
+  
+  <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		
   	<dependency>
 	    <groupId>org.objenesis</groupId>
 	    <artifactId>objenesis</artifactId>
@@ -77,11 +98,19 @@
       <version>${cometd-version}</version>
       <type>war</type>
     </dependency>
-    <dependency>
-      <groupId>org.cometd.java</groupId>
-      <artifactId>cometd-java-server</artifactId>
-      <version>${cometd-version}</version>
-    </dependency>
+<!-- https://mvnrepository.com/artifact/org.cometd.java/cometd-java-server -->
+<dependency>
+    <groupId>org.cometd.java</groupId>
+    <artifactId>cometd-java-server</artifactId>
+    <version>4.0.4</version>
+</dependency>
+
+<dependency>
+    <groupId>net.iharder</groupId>
+    <artifactId>base64</artifactId>
+    <version>2.3.8</version>
+</dependency>
+
     <dependency>
       <groupId>org.cometd.java</groupId>
       <artifactId>cometd-java-websocket-javax-server</artifactId>

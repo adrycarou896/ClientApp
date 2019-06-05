@@ -5,6 +5,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 
 import org.cometd.bayeux.server.BayeuxServer;
 import org.cometd.annotation.ServerAnnotationProcessor;
@@ -13,17 +14,33 @@ import org.cometd.server.transport.JSONPTransport;
 import org.cometd.server.transport.JSONTransport;
 import org.cometd.websocket.server.WebSocketTransport;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor;
+import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.ServletContextAware;
 
 @Component
 public class CometDInitializer implements ServletContextAware {
+	
     private ServletContext servletContext;
-
+    
     @Bean(initMethod = "start", destroyMethod = "stop")
-    public BayeuxServer bayeuxServer() {
+    public ServletContextInitializer initializer() {
+        return new ServletContextInitializer() {
+            @Override
+            public void onStartup(ServletContext servletContext) throws ServletException {
+            	setServletContext(servletContext);
+                servletContext.setAttribute(BayeuxServer.ATTRIBUTE, bayeuxServer(servletContext));
+            }
+        };
+    }
+    
+    @Bean
+    public BayeuxServer bayeuxServer(ServletContext servletContext) {
+    	this.servletContext = servletContext;
+    	
         BayeuxServerImpl bean = new BayeuxServerImpl();
         bean.setTransports(new WebSocketTransport(bean), new JSONTransport(bean), new JSONPTransport(bean));
         servletContext.setAttribute(BayeuxServer.ATTRIBUTE, bean);
