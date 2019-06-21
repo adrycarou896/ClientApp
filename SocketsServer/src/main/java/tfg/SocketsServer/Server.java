@@ -13,8 +13,11 @@ public class Server
     public static void main( String[] args ) throws IOException
     {
     	ServerSocket ss = new ServerSocket(4999);
-		Socket s = ss.accept();
-		
-		System.out.println("Client conected");
+		do {
+	    	Socket s = ss.accept();
+			
+			System.out.println("Client conected");
+		}
+		while (true);
     }
 }
