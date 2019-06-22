@@ -13,15 +13,16 @@ public class Client
 {
     public static void main( String[] args ) throws UnknownHostException, IOException
     {
-    	Socket s = new Socket("localhost", 4999);
-    	ObjectInputStream dataInput = new ObjectInputStream(s.getInputStream());
-    	String text;
-		try {
-			text = String.valueOf(dataInput.readObject());
-			System.out.println(text);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
+    	while(true){
+    		Socket s = new Socket("localhost", 4999);
+        	ObjectInputStream input = new ObjectInputStream(s.getInputStream());
+        	try {
+    			String personJSON = String.valueOf(input.readObject());
+    			System.out.println(personJSON);
+    		} catch (ClassNotFoundException e) {
+    			e.printStackTrace();
+    		}
+    	}
     	
     }
 }
