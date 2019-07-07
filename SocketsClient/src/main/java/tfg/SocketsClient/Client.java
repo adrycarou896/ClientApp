@@ -6,6 +6,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Date;
 
+import javax.swing.JLabel;
+
 import org.json.JSONObject;
 
 /**
@@ -14,9 +16,11 @@ import org.json.JSONObject;
  */
 public class Client 
 {
-    public static void main( String[] args ) throws UnknownHostException, IOException
+    public void processInfo(VentanaPrincipal principal) throws UnknownHostException, IOException
     {
     	while(true){
+    		JLabel label = principal.getLabel();
+    		
     		Socket s = new Socket("localhost", 4999);
         	ObjectInputStream input = new ObjectInputStream(s.getInputStream());
         	try {
@@ -35,6 +39,24 @@ public class Client
     			
     			System.out.println(personName+" a las "+dateEvent.toString()+" "+messageEvent);
     			System.out.println(eventJSON.toString());
+    			
+    			String[] messageArray = messageEvent.split(" ");
+    			try{
+    				String accion=messageArray[0];
+    				int clase=Integer.parseInt(messageArray[messageArray.length-1]);
+    				
+    				int numActual = Integer.parseInt(label.getText());
+    				if(accion.toLowerCase().equals("entró")){
+    					
+    					label.setText(String.valueOf(numActual+1));
+    				}
+    				else if(accion.toLowerCase().equals("salió")){
+    					label.setText(String.valueOf(numActual-1));
+    				}
+    			}
+    			catch(Exception e){
+    				e.printStackTrace();
+    			}
     			
     			
     			
