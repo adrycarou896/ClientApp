@@ -6,24 +6,23 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Date;
 
-import javax.swing.JLabel;
-
 import org.json.JSONObject;
 
 /**
  * Hello world!
  *
  */
-public class Client 
+public abstract class Client extends Thread
 {
-    public void processInfo(VentanaPrincipal principal) throws UnknownHostException, IOException
+    public void run()
     {
     	while(true){
-    		JLabel label = principal.getLabel();
     		
-    		Socket s = new Socket("localhost", 4999);
-        	ObjectInputStream input = new ObjectInputStream(s.getInputStream());
-        	try {
+    		Socket s;
+			try {
+				s = new Socket("localhost", 4999);
+				ObjectInputStream input = new ObjectInputStream(s.getInputStream());
+				
     			String dataJSON = String.valueOf(input.readObject());
     			//System.out.println(dataJSON);
     			
@@ -41,29 +40,33 @@ public class Client
     			System.out.println(eventJSON.toString());
     			
     			String[] messageArray = messageEvent.split(" ");
-    			try{
-    				String accion=messageArray[0];
-    				int clase=Integer.parseInt(messageArray[messageArray.length-1]);
-    				
-    				int numActual = Integer.parseInt(label.getText());
-    				if(accion.toLowerCase().equals("entró")){
-    					
-    					label.setText(String.valueOf(numActual+1));
-    				}
-    				else if(accion.toLowerCase().equals("salió")){
-    					label.setText(String.valueOf(numActual-1));
-    				}
-    			}
-    			catch(Exception e){
-    				e.printStackTrace();
-    			}
     			
-    			
-    			
-    		} catch (ClassNotFoundException e) {
-    			e.printStackTrace();
-    		}
+				String accion=messageArray[0];
+				int clase=Integer.parseInt(messageArray[messageArray.length-1]);
+				
+				//int numActual = Integer.parseInt(label.getText());
+				if(accion.toLowerCase().equals("entró")){
+					enter();
+					//label.setText(String.valueOf(numActual+1));
+				}
+				else if(accion.toLowerCase().equals("salió")){
+					out();
+					//label.setText(String.valueOf(numActual-1));
+				}
+	    			
+	    			
+			} catch (UnknownHostException e1) {
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
     	}
     	
     }
+    
+    public abstract void enter();
+    
+    public abstract void out();
 }
