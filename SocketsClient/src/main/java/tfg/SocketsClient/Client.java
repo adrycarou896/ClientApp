@@ -42,16 +42,13 @@ public abstract class Client extends Thread
     			String[] messageArray = messageEvent.split(" ");
     			
 				String accion=messageArray[0];
-				int clase=Integer.parseInt(messageArray[messageArray.length-1]);
+				int hall=Integer.parseInt(messageArray[messageArray.length-1]);
 				
-				//int numActual = Integer.parseInt(label.getText());
-				if(accion.toLowerCase().equals("entró")){
+				if(accion.toLowerCase().equals("enter")){
 					enter();
-					//label.setText(String.valueOf(numActual+1));
 				}
-				else if(accion.toLowerCase().equals("salió")){
+				else if(accion.toLowerCase().equals("out")){
 					out();
-					//label.setText(String.valueOf(numActual-1));
 				}
 	    			
 	    			
@@ -67,6 +64,5 @@ public abstract class Client extends Thread
     }
     
     public abstract void enter();
-    
     public abstract void out();
 }
