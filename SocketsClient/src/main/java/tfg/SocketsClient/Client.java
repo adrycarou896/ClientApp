@@ -14,9 +14,11 @@ import org.json.JSONObject;
  */
 public abstract class Client extends Thread
 {
+	private boolean continuar = true;
+	
     public void run()
     {
-    	while(true){
+    	while(this.continuar){
     		
     		Socket s;
 			try {
@@ -45,10 +47,10 @@ public abstract class Client extends Thread
 				int hall=Integer.parseInt(messageArray[messageArray.length-1]);
 				
 				if(accion.toLowerCase().equals("enter")){
-					enter();
+					enter(personName, dateEvent, hall);
 				}
 				else if(accion.toLowerCase().equals("out")){
-					out();
+					out(personName, dateEvent, hall);
 				}
 	    			
 	    			
@@ -63,6 +65,10 @@ public abstract class Client extends Thread
     	
     }
     
-    public abstract void enter();
-    public abstract void out();
+    public abstract void enter(String personName, Date dateEvent, int hall);
+    public abstract void out(String personName, Date dateEvent, int hall);
+    
+    public void stopThread(){
+    	this.continuar = false;
+    }
 }
