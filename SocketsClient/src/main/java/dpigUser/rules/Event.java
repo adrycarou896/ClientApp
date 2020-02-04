@@ -6,12 +6,14 @@ public class Event {
 	
 	private String person; 
 	private Date accomplishedDate;
+	private String action;
 	private int hall;
 	
 	
-	public Event(String person, Date accomplishedDate, int hall) {
+	public Event(String person, Date accomplishedDate, String action, int hall) { 
 		this.person = person;
 		this.accomplishedDate = accomplishedDate;
+		this.action = action;
 		this.hall = hall;
 	}
 	
@@ -27,6 +29,15 @@ public class Event {
 	public void setAccomplishedDate(Date accomplishedDate) {
 		this.accomplishedDate = accomplishedDate;
 	}
+	
+	public String getAction() {
+		return action;
+	}
+
+	public void setAction(String action) {
+		this.action = action;
+	}
+
 	public int getHall() {
 		return hall;
 	}

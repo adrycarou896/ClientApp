@@ -3,7 +3,7 @@ package dpigUser;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
+import java.util.Calendar;
 import java.util.Date;
 
 import org.json.JSONObject;
@@ -17,20 +17,22 @@ import dpigUser.rules.Event;
  */
 public abstract class DPIGTemplateUser extends Thread
 {
-	private boolean continuar = true;
+
+	private int port;
+	private String direction = "localhost";
+	private boolean connectionOpen = false;
 	
 	@Override
     public void run()
     {
-    	while(this.continuar){
+    	while(this.connectionOpen){
     		
     		Socket s;
 			try {
-				s = new Socket("localhost", 4999);
+				s = new Socket(direction, port);
 				ObjectInputStream input = new ObjectInputStream(s.getInputStream());
 				
     			String dataJSON = String.valueOf(input.readObject());
-    			//System.out.println(dataJSON);
     			
     			JSONObject data = new JSONObject(dataJSON);
     			
@@ -39,42 +41,40 @@ public abstract class DPIGTemplateUser extends Thread
     			
     			JSONObject eventJSON = (JSONObject) data.get("event");
     			if(eventJSON!=null){
-    				Date accomplishedDate = new Date();
-        			accomplishedDate.setTime(eventJSON.getLong("accomplishedDate"));
-        			String eventMessage = eventJSON.getString("message");
-        			
-        			System.out.println(person+" a las "+accomplishedDate.toString()+" "+eventMessage);
-        			System.out.println(eventJSON.toString());
-        			
-        			String[] messageArray = eventMessage.split(" ");
-        			
-    				String accion=messageArray[0];
-    				int hall=Integer.parseInt(messageArray[messageArray.length-1]);
+    				Long timeInMillis = eventJSON.getLong("accomplishedDate");
+    				Date accomplishedDate = getDateTime(timeInMillis);
     				
-    				Event event = new Event(person, accomplishedDate, hall);
-    				if(accion.toLowerCase().equals("enter")){
+        			String action = eventJSON.getString("action");
+        			int hall = eventJSON.getInt("hall");
+    				
+    				Event event = new Event(person, accomplishedDate, action, hall);
+    				if(action.toLowerCase().equals("in")){
+    					in(event);
+    				}
+    				else if(action.toLowerCase().equals("enter")){
     					enter(event);
     				}
-    				else if(accion.toLowerCase().equals("out")){
+    				else if(action.toLowerCase().equals("out")){
     					out(event);
     				}
     			}
     			else{
     				JSONObject alertJSON = (JSONObject) data.get("alert");
-    				Date dateAlert = new Date();
-    				dateAlert.setTime(alertJSON.getLong("dateAlert"));
+    				
+    				Long timeInMillisDateAlert = alertJSON.getLong("dateAlert");
+    				Date dateAlert = getDateTime(timeInMillisDateAlert);
         			
     				String operatorAlert = alertJSON.getString("operator");
     				
     				JSONObject eventAlertJSON = (JSONObject) alertJSON.get("event");
-    				Date accomplishedDate = new Date();
-        			accomplishedDate.setTime(eventAlertJSON.getLong("accomplishedDate"));
-    				String eventAlertMessage = eventAlertJSON.getString("message");
     				
-    				String[] messageArray = eventAlertMessage.split(" ");
-    				int eventHall=Integer.parseInt(messageArray[messageArray.length-1]);
+    				Long timeInMillis = eventAlertJSON.getLong("accomplishedDate");
+    				Date accomplishedDate = getDateTime(timeInMillis);
     				
-    				Event event = new Event(person, accomplishedDate, eventHall);
+        			String action = eventAlertJSON.getString("action");
+        			int hall = eventAlertJSON.getInt("hall");
+    				
+    				Event event = new Event(person, accomplishedDate, action, hall);
     				Alert alert = new Alert(event, dateAlert);
     				if(operatorAlert.toLowerCase().equals("max")){
     					alertMax(alert);
@@ -83,21 +83,37 @@ public abstract class DPIGTemplateUser extends Thread
     					alertMin(alert);
     				}
     				
-    			}
-    			
+    			}		
 	    			
-	    			
-			} catch (UnknownHostException e1) {
+			} catch (IOException | ClassNotFoundException e1) {
 				e1.printStackTrace();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+				this.connectionOpen = false;
 			}
     	}
     	
     }
+	
+	private Date getDateTime(Long timeInMillis){
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(timeInMillis);
+		return calendar.getTime();
+	}
     
+	public void startConnectionToDPIGServer(String direction, int port){
+		this.direction = direction;
+		this.port = port;
+		this.connectionOpen = true;
+		start();
+	}
+	
+	public void startConnectionToDPIGServer(int port){
+		this.port = port;
+		this.direction = "localhost";
+		this.connectionOpen = true;
+		start();
+	}
+	
+	public abstract void in(Event event);
     public abstract void enter(Event event);
     public abstract void out(Event event);
     
@@ -105,6 +121,6 @@ public abstract class DPIGTemplateUser extends Thread
     public abstract void alertMin(Alert alert);
     
     public void stopThread(){
-    	this.continuar = false;
+    	this.connectionOpen = false;
     }
 }
